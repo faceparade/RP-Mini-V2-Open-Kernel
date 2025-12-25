@@ -1,0 +1,10 @@
+# Common "choice" prompts that often have no default in some trees:
+CONFIG_MODULE_SIG_KEY_TYPE_RSA=y
+CONFIG_LTO_NONE=y
+CONFIG_DEBUG_INFO_NONE=y
+CONFIG_INIT_STACK_NONE=y
+CONFIG_RANDSTRUCT_NONE=y
+
+# If you see /proc/pid/mem override choice prompts, pick safest:
+CONFIG_PROC_MEM_NO_FORCE=y
+CONFIG_COMPAT_VDSO=y

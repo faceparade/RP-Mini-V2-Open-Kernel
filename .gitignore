@@ -1,0 +1,15 @@
+out/
+*.o
+*.a
+*.so
+*.cmd
+*.d
+*.dtb
+*.dtbo
+*.mod*
+Module.symvers
+modules.order
+modules.builtin
+modules.builtin.modinfo
+include/config/
+include/generated/
