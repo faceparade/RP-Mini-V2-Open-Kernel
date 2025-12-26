@@ -21,6 +21,16 @@
 #include "qcom_pmic_typec.h"
 #include "qcom_pmic_typec_port.h"
 
+/*
+ * Kill-switch: block VBUS sourcing (host/power-source) while still allowing
+ * sink/charging behavior. This is intended to prevent the device from
+ * sourcing 5V on USB-C during DP alt-mode scenarios.
+ */
+static bool block_vbus_source;
+module_param_named(block_vbus_source, block_vbus_source, bool, 0644);
+MODULE_PARM_DESC(block_vbus_source, "If true, refuse to enable VBUS sourcing (tcpm set_vbus on, sink=false)");
+
+
 #define TYPEC_SNK_STATUS_REG				0x06
 #define DETECTED_SNK_TYPE_MASK				GENMASK(6, 0)
 #define SNK_DAM_MASK					GENMASK(6, 4)
@@ -340,7 +350,13 @@ static int qcom_pmic_typec_port_set_vbus(struct tcpc_dev *tcpc, bool on, bool si
 	struct pmic_typec_port *pmic_typec_port = tcpm->pmic_typec_port;
 	int ret = 0;
 
-	mutex_lock(&pmic_typec_port->vbus_lock);
+	
+        if (on && !sink && block_vbus_source) {
+                dev_info(tcpm->dev, "VBUS source blocked by kill-switch (block_vbus_source=1)\n");
+                return -EPERM;
+        }
+
+        mutex_lock(&pmic_typec_port->vbus_lock);
 	if (pmic_typec_port->vbus_enabled == on)
 		goto done;
 
